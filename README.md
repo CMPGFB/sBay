@@ -1,33 +1,32 @@
 ## sBay Decentralized Marketplace
-
-**Author**: Christopher Perceptions 
+**Author**: Christopher Perceptions
 
 **Powered by**: NoCodeClarity v2 
 
 ### **Overview**  
-sBay is a decentralized marketplace that allows users to buy and sell digital goods using STX tokens. The platform charges a 10% fee on every sale, which is automatically transferred to the platform owner. It is designed for transparency, security, and operates fully on the Stacks blockchain using Clarity smart contracts.
+sBay is a decentralized marketplace that allows users to buy and sell digital goods using STX tokens. The platform charges a configurable fee on every sale, which is automatically transferred to the platform owner. It is designed for transparency, security, and operates fully on the Stacks blockchain using Clarity smart contracts.
 
 ### **Constants**
 - **platform-owner**: The principal of the contract owner.
-- **platform-fee**: 10% of the sale price.
+- **platform-fee**: Configurable fee represented in basis points (default 100 = 1%).
 
 ### **Error Codes**
-- **err-unauthorized**: Error when an unauthorized user attempts an action.
-- **err-not-found**: Error when the listing is not found.
-- **err-already-sold**: Error when trying to buy an already sold or canceled item.
-- **err-insufficient-funds**: Error when the buyer does not provide enough STX.
-- **err-item-expired**: Error when trying to purchase an expired listing.
+- **ERR_UNAUTHORIZED (u100)**: Error when an unauthorized user attempts an action.
+- **ERR_NOT_FOUND (u101)**: Error when the listing is not found.
+- **ERR_INVALID_STATUS (u102)**: Error when trying to interact with a listing in an invalid status.
+- **ERR_EXPIRED (u103)**: Error when trying to purchase an expired listing.
+- **ERR_INSUFFICIENT_FUNDS (u104)**: Error when the buyer does not provide enough STX.
+- **ERR_INVALID_FEE (u105)**: Error when trying to set an invalid platform fee.
 
 ### **Data Variables**
 - **next-listing-id**: A unique, auto-incrementing ID for each listing.
 - **platform-balance**: The total balance of platform fees collected.
+- **platform-fee**: The current platform fee in basis points.
 
 ### **Maps**
-- **listings**: Stores listing details including seller, price, token type, status (active or sold), and optional expiry.
-- **sales**: Stores sales history, tracking the buyer and the item they purchased.
+- **listings**: Stores listing details including seller, price, token type, status, expiry, and buyer.
 
 ### **Public Functions**
-
 1. **`list-item`**  
    - Creates a new listing for a digital good.
    - **Parameters**:
@@ -40,41 +39,45 @@ sBay is a decentralized marketplace that allows users to buy and sell digital go
    - Allows a user to purchase an item.
    - **Parameters**:
      - `listing-id` (uint): The ID of the listing to purchase.
-   - **Returns**: Success (`ok true`) or an error if the purchase fails (e.g., listing is already sold or expired).
+   - **Returns**: Success (`ok true`) or an error if the purchase fails.
 
 3. **`cancel-listing`**  
    - Allows a seller to cancel their listing.
    - **Parameters**:
      - `listing-id` (uint): The ID of the listing to cancel.
-   - **Returns**: Success (`ok true`) or an error if the cancellation fails (e.g., unauthorized access or already sold).
+   - **Returns**: Success (`ok true`) or an error if the cancellation fails.
 
 4. **`withdraw-fees`**  
    - Allows the platform owner to withdraw the collected platform fees.
    - **Returns**: The withdrawn amount or an error if the user is unauthorized.
 
-### **Read-Only Functions**
+5. **`update-platform-fee`**  
+   - Allows the platform owner to update the platform fee.
+   - **Parameters**:
+     - `new-fee` (uint): The new fee in basis points.
+   - **Returns**: Success (`ok true`) or an error if the update fails.
 
+### **Read-Only Functions**
 1. **`get-listing`**  
    - Retrieves the details of a specific listing.
    - **Parameters**: 
      - `listing-id` (uint): The ID of the listing to retrieve.
-   - **Returns**: The listing details or `null` if the listing does not exist.
+   - **Returns**: The listing details or `none` if the listing does not exist.
 
-2. **`get-sales`**  
-   - Retrieves sales history for a buyer.
-   - **Parameters**: 
-     - `buyer` (principal): The buyer's principal address.
-   - **Returns**: The list of sales for the buyer or `null` if not found.
-
-3. **`get-platform-balance`**  
+2. **`get-platform-balance`**  
    - Retrieves the current platform balance.
    - **Returns**: The current platform balance.
 
+3. **`get-platform-fee`**  
+   - Retrieves the current platform fee.
+   - **Returns**: The current platform fee in basis points.
+
 ### **Notes**
-- Ensure that the platform owner’s principal is correctly set to enable withdrawal operations.
+- Ensure that the platform owner's principal is correctly set to enable withdrawal operations.
 - Listings may expire if the seller sets a block height expiration, automatically preventing the item from being sold after that point.
 - Platform fees are automatically deducted from each sale and stored in the contract.
-- This is generated by NoCodeClarity and has NOT undergone a formal audit. Use at your own risk.
+- The contract includes a trait definition for potential integration with SIP-009 compliant NFTs.
+- This contract is generated by NoCodeClarity v2 and has NOT undergone a formal audit. Use at your own risk.
 
 ### **License**
 - MIT
