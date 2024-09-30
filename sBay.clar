@@ -1,5 +1,5 @@
 ;; sBay Marketplace
-;; Author: Christopher Perceptions (Improved by Claude)
+;; Author: Christopher Perceptions
 ;; Powered by NoCodeClarity v2
 
 ;; Constants and Data Variables
